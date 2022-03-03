@@ -49,7 +49,7 @@ class Asic(Nexysio):
         }
 
         self.dacs = {
-            'blres': 10,
+            'blres': 0,
             'nu1': 0,
             'vn1': 10,
             'vnfb': 10,

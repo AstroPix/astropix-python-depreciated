@@ -57,6 +57,8 @@ def main():
     # Update voltageboards
     vboard1.update_vb()
 
+    print("Configured voltageboard")
+
     # Write only first 3 DACs, other DACs will be 0
     # vboard1.dacvalues = (8, [1.2, 1, 1])
     # vboard1.update_vb()
@@ -64,9 +66,11 @@ def main():
     #
     # Configure Injectionboard
     #
+    Vinj = 1.8
+    print(f"Injection run with Vinj = {Vinj} V" )
 
     # Set Injection level
-    injvoltage = Voltageboard(handle, 3, (2, [0.3, 0.0]))
+    injvoltage = Voltageboard(handle, 3, (2, [Vinj, 0.0])) #first element of array is injection voltage
     injvoltage.vcal = vboard1.vcal
     injvoltage.vsupply = vboard1.vsupply
     injvoltage.update_vb()
@@ -75,8 +79,10 @@ def main():
 
     # Set Injection Params for 330MHz patgen clock
     inj.period = 100
-    inj.clkdiv = 4000
-    inj.initdelay = 10000
+    #inj.clkdiv = 4000
+    #inj.initdelay = 10000
+    inj.clkdiv = 300
+    inj.initdelay = 100
     inj.cycle = 0
     inj.pulsesperset = 1
 
@@ -109,20 +115,24 @@ def main():
 
     inj.start()
 
-    wait_progress(3)
+    wait_progress(3) #argument is time in s
+    input("Press enter to stop injections and finish")
+
+    print("Done, stopping injections")
+    inj.stop()
 
     # Write 8*1000 Bytes to MOSI
-    nexys.write_spi_bytes(1000)
+    # nexys.write_spi_bytes(1000)
 
     # Read (Width 8 Bytes) until read FIFO is empty
-    readout = nexys.read_spi_fifo()
+    # readout = nexys.read_spi_fifo()
 
-    print(binascii.hexlify(readout))
+    #print(binascii.hexlify(readout))
 
-    decode = Decode()
-    list_hits = decode.hits_from_readoutstream(readout)
+    #decode = Decode()
+    #list_hits = decode.hits_from_readoutstream(readout)
 
-    decode.decode_astropix2_hits(list_hits)
+    #decode.decode_astropix2_hits(list_hits)
 
     # inj.stop()
 
